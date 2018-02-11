@@ -1,0 +1,79 @@
+
+    model {
+
+    #--------------------------------------
+    # Priors and constraints
+    #--------------------------------------
+
+    # Population abundances
+    logN0_grandmean ~ dnorm(0,0.001)
+    logN0_sd ~ dunif(0,5)
+    logN0_tau <- pow(logN0_sd,-2)
+
+    # Emergence
+    emergence_mean_grandmean ~ dunif(1,T) # grand mean emergence date across sites
+    emergence_mean_sigma ~ dunif(0,T) # variation in mean emergence date across sites
+    emergence_mean_tau <- pow(emergence_mean_sigma,-2)
+
+    emergence_sd ~ dunif(0,T) # SD within a site (assumed to be the same for all sites)
+
+    # Survival
+    surv_grandmean ~ dunif(0.01,0.99) # survival is assumed to be same across sites and through time
+
+    # Detection prob
+    #p ~ dunif(0.01,0.99) # only required if observation model is binomial
+
+    #--------------------------------------
+    # Likelihood
+    #--------------------------------------
+
+    for (i in 1:S){
+
+        # Fix initial population sizes to 0
+        N_true[1,i] <- 0
+        t_stand[1,i] <- 0
+        pdf_emerged[1,i] <- 0
+        cdf_emerged[1,i] <- 0
+        recruits[1,i] <- 0
+
+        N_total[i] ~ dlnorm(logN0_grandmean,logN0_tau)
+
+        # Emergence
+        mean_emerge[i] ~ dnorm(emergence_mean_grandmean, emergence_mean_tau)
+
+        sd_emerge[i]   <- emergence_sd #all sites have same sd
+
+        surv[i] <- surv_grandmean
+
+        # Observation Process
+        for (t in 1:T){
+            #y[t,i] ~ dnorm(N_true[t,i], tau.obs[i])
+            y[t,i] ~ dpois(N_true[t,i])
+            #y[t,i] ~ dbin(p,N_true[t,i]) #If binomial detection
+
+        }
+
+        # Population Dynamics
+        for (t in 2:T){
+
+            # Emergence Dynamics
+            t_stand[t,i] <- (t - mean_emerge[i])/sd_emerge[i]
+            cdf_emerged[t,i] <- phi(t_stand[t,i])
+            pdf_emerged[t,i] <- cdf_emerged[t,i] - cdf_emerged[t-1,i] # normal PDF for daily survival
+
+            #binomial recruitment
+            recruits[t,i] ~ dbin(pdf_emerged[t,i], round(N_total[i])) #if recruitment is binomial
+            #recruits[t,i] <- round(pdf_emerged[t,i] * N_total[i]) #non-binomial recruitment
+
+            # binomial survival
+            survivors[t,i] ~ dbin(surv[i],N_true[t-1,i]) # binomial survival
+            #survivors[t,i] <- round(surv[i]*N_true[t-1,i]) #non-binomial (smoothed) survival
+
+            N_true[t,i] <-  survivors[t,i] + recruits[t,i]
+        }
+
+    }
+
+
+    }
+    
