@@ -254,13 +254,15 @@ nc <- 2       # Number of chains
 out <- jags(data = bugs.data,inits,parameters,"invert_statespace_simulated.bug",
             nc,nt,ni,nb)
 
-#Save output (this file is huge)
-save(out, file = "invert_simulated_basic.RData")
+#Save output (this file is huge - so this is commented out right now)
+#save(out, file = "invert_simulated_basic.RData")
 #rm(out)
 
 #-------------------------------------------------------------
 # SUMMARIZE AND PLOT RESULTS
 #-------------------------------------------------------------
+
+# Calculate posterior summary statistics for estimated N at each site
 N_median = N_0.025 = N_0.975 = as.data.frame(y*NA)
 
 for (s in 1:ncol(y)){
@@ -278,7 +280,7 @@ N_0.975_melt <- melt(N_0.975, id=c("Day"), value.name = "est_count")
 
 colnames(N_median_melt) = colnames(N_0.025_melt) = colnames(N_0.975_melt) = c("Day","Site","est_count")
 
-# Plot model estimates, compared to truth (blue)
+# Plot model estimates (black) compared to truth (blue)
 plot = ggplot(data = mdata) +
 
     #Estimated abundance
@@ -300,10 +302,10 @@ plot = ggplot(data = mdata) +
     facet_grid(Site~., scales = "free")+
     theme_bw()+
     xlab("Day")+
-    ylab("Count")+
-    ggtitle("Simulated Inverts")+
+    ylab("Population Size")+
+    ggtitle(paste("Simulated Inverts; ",ni," iterations", sep=""))+
 
-    #legend
+    # legend
     scale_shape_manual(name = '',values =c(19), labels = c('Observed Count'))+
     scale_color_manual(name = '',values =c("black","dodgerblue"), labels = c('Estimated Abundance','True Abundance'))
 
