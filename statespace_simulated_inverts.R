@@ -142,7 +142,7 @@ print(plot)
 # BAYESIAN ANALYSIS
 #-------------------------------------------------------------
 
-sink("Invert_statespace_simulated.bug")
+sink("statespace_simulated_invert.jags")
 cat("
     model {
 
@@ -266,15 +266,15 @@ parameters <- c("logNtotal_spatialmean","logNtotal_sigma",
                 "N_true")
 
 # MCMC settings
-ni <- 75000  # Number of iterations
+ni <- 10000  # Number of iterations
 nt <- 10      # Thinning rate
-nb <- 65000  # Burn-in period
+nb <- 8000  # Burn-in period
 nc <- 2       # Number of chains
 
 out <- jags(data  = bugs.data,
             inits,
             parameters,
-            "Invert_statespace_simulated.bug",
+            "statespace_simulated_invert.jags",
             nc,
             nt,
             ni,
