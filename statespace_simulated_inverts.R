@@ -106,7 +106,6 @@ for (s in 1:sites){
 
 }
 
-
 N_df = as.data.frame(N)
 colnames(N_df)[1:sites] = paste("Site",1:sites)
 N_df$Day = seq(1,nrow(N))
