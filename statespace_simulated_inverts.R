@@ -58,7 +58,7 @@ summary_of_sites
 
 #Construct a matrix to store abundance dynamics for all sites (columns are sites, rows are days of season)
 N = matrix(NA,nrow=time, ncol = sites)
-Nobs = matrix(NA,nrow=time, ncol = sites) #Observed dynamics (removal sampling)
+Nobs = matrix(NA,nrow=time, ncol = sites) #Store observed dynamics
 
 #Days each site was actually visited
 visit_days = round(seq(2,time,length.out = 8))
@@ -120,6 +120,12 @@ colnames(Ndata) = c("Day","Site","true_count")
 
 Nobsdata <- melt(Nobs_df, id=c("Day"), value.name = "obs_count")
 colnames(Nobsdata) = c("Day","Site","obs_count")
+
+#############################
+# Add Poisson Error on top of binomial (removal) sampling
+# (this simulates imperfect identification)
+Nobsdata$obs_count = rpois(nrow(Nobsdata),Nobsdata$obs_count + 0.1) #adds 10% chance of getting a 1 in place of zero, and increases variance in number of misID'd specimens with larger sample sizes
+#############################
 
 #Plot simulated data (and observations)
 plot = ggplot(data = Ndata) +
