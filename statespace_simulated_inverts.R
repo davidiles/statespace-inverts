@@ -23,7 +23,6 @@ mean_emergence_SPATIALSD = 10
 
 logsd_emergence_GRANDMEAN = log(6)
 logsd_emergence_SPATIALSD = 0.35
-hist(rlnorm(10000,logsd_emergence_GRANDMEAN,logsd_emergence_SPATIALSD))
 
 survival_grandmean = 0.95
 survival_sd_logit = 0.6
@@ -240,17 +239,17 @@ inits <- list( list(logNtotal_spatialmean = 7,
                     logNtotal_sigma = 0.4,
                     emergence_mean_grandmean = 60,
                     emergence_mean_sigma = 10,
-                    log_emergence_sd_grandmean = 1,
-                    log_emergence_sd_sigma = 0.1,
+                    log_emergence_sd_grandmean = 2,
+                    log_emergence_sd_sigma = 0.3,
                     surv_grandmean = 0.8,
-                    surv_sigma_logit = 0.2),
+                    surv_sigma_logit = 0.7),
 
-               list(logNtotal_spatialmean = 4,
+               list(logNtotal_spatialmean = 6,
                     logNtotal_sigma = 0.6,
                     emergence_mean_grandmean = 40,
                     emergence_mean_sigma = 10,
                     log_emergence_sd_grandmean = 1,
-                    log_emergence_sd_sigma = 0.05,
+                    log_emergence_sd_sigma = 0.5,
                     surv_grandmean = 0.9,
                     surv_sigma_logit = 0.5)
 
@@ -266,9 +265,9 @@ parameters <- c("logNtotal_spatialmean","logNtotal_sigma",
                 "N_true")
 
 # MCMC settings
-ni <- 10000  # Number of iterations
+ni <- 50000  # Number of iterations
 nt <- 10      # Thinning rate
-nb <- 8000  # Burn-in period
+nb <- 45000  # Burn-in period
 nc <- 2       # Number of chains
 
 out <- jags(data  = bugs.data,
